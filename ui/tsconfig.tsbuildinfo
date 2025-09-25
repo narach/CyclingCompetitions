@@ -1,1 +1,1 @@
-{"root":["./src/main.tsx","./src/routes/admin.tsx","./src/routes/app.tsx","./src/routes/events.tsx","./src/routes/home.tsx"],"version":"5.9.2"}
+{"root":["./src/main.tsx","./src/types.ts","./src/middleware/config.ts","./src/middleware/events.ts","./src/middleware/registrations.ts","./src/routes/admin.tsx","./src/routes/app.tsx","./src/routes/events.tsx","./src/routes/home.tsx","./src/routes/register.tsx","./src/routes/registercompleted.tsx"],"version":"5.9.2"}

@@ -1,37 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import type { RegistrationDTO, RegistrationInput, Event } from '../types'
+import { registerForEvent } from '../middleware/registrations'
 
-type RegistrationInput = {
-  eventId: number
-  name: string
-  surname: string
-  email: string
-  phone?: string
-  gender?: string
-  birth_year?: number
-  club?: string
-  country?: string
-  city?: string
-}
-
-type RegistrationDTO = {
-  id: number
-  event_id: number
-  name: string
-  surname: string
-  email: string
-  phone: string
-  gender: string
-  birth_year: number | null
-  club: string
-  country: string
-  city: string
-  start_number: number | null
-  created_at: string
-  updated_at: string
-}
-
-const API_URL = 'https://8dakoeglog.execute-api.eu-central-1.amazonaws.com'
+// API calls and types are imported from middleware and shared types
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i
 const phoneRegex = /^[+]?[-()\s\d]{7,20}$/
@@ -39,6 +11,8 @@ const phoneRegex = /^[+]?[-()\s\d]{7,20}$/
 export default function Register() {
   const navigate = useNavigate()
   const { eventId } = useParams()
+  const { state } = useLocation() as { state?: { event?: Event } }
+  const event = state?.event
 
   const eventIdNum = useMemo(() => {
     const n = Number(eventId)
@@ -115,29 +89,11 @@ export default function Register() {
 
     try {
       setSubmitting(true)
-      const resp = await fetch(`${API_URL}/registrations`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(toSend)
-      })
-      const text = await resp.text()
-      if (!resp.ok) {
-        let msg = ''
-        try {
-          const j = JSON.parse(text)
-          msg = j?.message || j?.error || text
-        } catch {
-          msg = text
-        }
-        throw new Error(msg || `HTTP ${resp.status}`)
-      }
-      let data: { registration: RegistrationDTO }
-      try {
-        data = JSON.parse(text) as { registration: RegistrationDTO }
-      } catch {
-        throw new Error('Invalid response from server')
-      }
-      navigate(`/register/${encodeURIComponent(String(form.eventId))}/completed`, { state: data })
+      const data = await registerForEvent(toSend)
+      navigate(
+        `/register/${encodeURIComponent(String(form.eventId))}/completed`,
+        { state: { ...data, eventName: event?.event_name || '' } }
+      )
     } catch (e: any) {
       setServerError(e.message || String(e))
     } finally {
@@ -157,7 +113,28 @@ export default function Register() {
 
   return (
     <div>
-      <h2>Register</h2>
+      <h2>Register to {event?.event_name || 'Event'}</h2>
+
+      {event && (
+        <div className="mb-3">
+          <div className="row g-2">
+            <div className="col-md-4">
+              <div className="small text-muted">When</div>
+              <div>{(() => { const d = new Date(event.event_time); return isNaN(d.getTime()) ? event.event_time : d.toLocaleString() })()}</div>
+            </div>
+            <div className="col-md-4">
+              <div className="small text-muted">Description</div>
+              <div>{event.event_description || '—'}</div>
+            </div>
+            <div className="col-md-4">
+              <div className="small text-muted">Route</div>
+              <div>
+                {event.route ? <a href={event.route} target="_blank" rel="noreferrer">View</a> : '—'}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {serverError && (
         <div className="alert alert-danger" role="alert">{serverError}</div>

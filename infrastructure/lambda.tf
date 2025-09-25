@@ -96,6 +96,7 @@ resource "aws_lambda_function" "events_create" {
   runtime       = local.lambda_runtime
   handler       = "index.handler"
   filename      = data.archive_file.events_create.output_path
+  source_code_hash = filebase64sha256(data.archive_file.events_create.output_path)
   memory_size   = var.lambda_memory_mb
   timeout       = var.lambda_timeout_seconds
   reserved_concurrent_executions = 2
@@ -110,8 +111,9 @@ resource "aws_lambda_function" "registrations_create" {
   role          = aws_iam_role.lambda_role.arn
   architectures = [local.lambda_architecture]
   runtime       = local.lambda_runtime
-  handler       = "dist/index.handler"
+  handler       = "index.handler"
   filename      = data.archive_file.registrations_create_built.output_path
+  source_code_hash = filebase64sha256(data.archive_file.registrations_create_built.output_path)
   memory_size   = var.lambda_memory_mb
   timeout       = var.lambda_timeout_seconds
   reserved_concurrent_executions = 2
@@ -128,6 +130,7 @@ resource "aws_lambda_function" "registrations_list" {
   runtime       = local.lambda_runtime
   handler       = "index.handler"
   filename      = data.archive_file.registrations_list.output_path
+  source_code_hash = filebase64sha256(data.archive_file.registrations_list.output_path)
   memory_size   = var.lambda_memory_mb
   timeout       = var.lambda_timeout_seconds
   reserved_concurrent_executions = 2
@@ -144,6 +147,7 @@ resource "aws_lambda_function" "events_list" {
   runtime       = local.lambda_runtime
   handler       = "index.handler"
   filename      = data.archive_file.events_list.output_path
+  source_code_hash = filebase64sha256(data.archive_file.events_list.output_path)
   memory_size   = var.lambda_memory_mb
   timeout       = var.lambda_timeout_seconds
   reserved_concurrent_executions = 2

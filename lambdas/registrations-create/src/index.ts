@@ -137,7 +137,12 @@ export const handler = async (event: any) => {
     }
   } catch (err) {
     console.error(err);
-    return { statusCode: 500, headers: { 'content-type': 'application/json' }, body: JSON.stringify({ error: 'Internal Server Error' }) };
+    const message = (err as any)?.message || 'Internal Server Error';
+    return {
+      statusCode: 500,
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ error: 'ServerError', message })
+    };
   }
 };
 

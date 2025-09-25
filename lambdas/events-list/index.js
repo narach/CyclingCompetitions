@@ -47,7 +47,8 @@ exports.handler = async () => {
     }
   } catch (err) {
     console.error(err);
-    return http(500, { error: 'Internal Server Error' });
+    const message = err?.message || 'Internal Server Error';
+    return http(500, { error: 'ServerError', message });
   }
 };
 

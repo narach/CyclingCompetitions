@@ -1,15 +1,8 @@
 import { useMemo, useState } from 'react'
+import { createEvent } from '../middleware/events'
+import type { EventCreateInput, NewEventFormState } from '../types'
 
-type FormState = {
-  event_name: string
-  event_date: string
-  event_time: string
-  event_description: string
-  event_route: string
-  event_location: string
-}
-
-const initialState: FormState = {
+const initialState: NewEventFormState = {
   event_name: '',
   event_date: '',
   event_time: '',
@@ -18,13 +11,13 @@ const initialState: FormState = {
   event_location: ''
 }
 
-const API_URL = 'https://8dakoeglog.execute-api.eu-central-1.amazonaws.com'
+// API calls are encapsulated in middleware/events
 
 export default function Admin() {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
-  const [form, setForm] = useState<FormState>(initialState)
+  const [form, setForm] = useState<NewEventFormState>(initialState)
 
   const isValid = useMemo(() => {
     return form.event_name.trim() && form.event_date && form.event_time && form.event_route.trim()
@@ -40,22 +33,14 @@ export default function Admin() {
     setMessage(null)
     try {
       const dt = new Date(`${form.event_date}T${form.event_time}`)
-      const payload = {
+      const payload: EventCreateInput = {
         event_name: form.event_name.trim(),
         event_time: dt.toISOString(),
         event_description: form.event_description.trim() || undefined,
         route: form.event_route.trim(),
         event_start: form.event_location.trim() || undefined
       }
-      const resp = await fetch(`${API_URL}/events`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      if (!resp.ok) {
-        const txt = await resp.text()
-        throw new Error(txt || `HTTP ${resp.status}`)
-      }
+      await createEvent(payload)
       setMessage('Event created successfully')
       setForm(initialState)
       setShowForm(false)

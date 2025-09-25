@@ -4,6 +4,7 @@ export default function RegisterCompleted() {
   const { eventId } = useParams()
   const { state } = useLocation() as { state: any }
   const registration = state?.registration
+  const eventName: string | undefined = state?.eventName
 
   return (
     <div>
@@ -13,11 +14,11 @@ export default function RegisterCompleted() {
       ) : (
         <div className="card">
           <div className="card-body">
+            <div className="mb-3">
+              <div className="h5 mb-1">{eventName || 'Event'}</div>
+              <div className="text-muted">Start Number: {registration.start_number ?? '—'}</div>
+            </div>
             <dl className="row mb-0">
-              <dt className="col-sm-3">Registration ID</dt>
-              <dd className="col-sm-9">{registration.id}</dd>
-              <dt className="col-sm-3">Event ID</dt>
-              <dd className="col-sm-9">{registration.event_id}</dd>
               <dt className="col-sm-3">Name</dt>
               <dd className="col-sm-9">{registration.name} {registration.surname}</dd>
               <dt className="col-sm-3">Email</dt>

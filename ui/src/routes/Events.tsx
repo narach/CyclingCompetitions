@@ -1,32 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-
-type EventItem = {
-  id: string
-  event_name: string
-  event_time: string
-  event_description?: string | null
-  route?: string | null
-  event_start?: string | null
-}
-
-const API_URL = 'https://8dakoeglog.execute-api.eu-central-1.amazonaws.com'
+import type { Event } from '../types'
+import { fetchEvents } from '../middleware/events'
 
 export default function Events() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [events, setEvents] = useState<EventItem[]>([])
+  const [events, setEvents] = useState<Event[]>([])
 
   useEffect(() => {
     const load = async () => {
       setLoading(true)
       setError(null)
       try {
-        const resp = await fetch(`${API_URL}/events`)
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
-        const data = await resp.json()
-        setEvents(Array.isArray(data.events) ? data.events : [])
+        const data = await fetchEvents()
+        setEvents(data)
       } catch (e: any) {
         setError(e.message || String(e))
       } finally {
@@ -38,8 +27,10 @@ export default function Events() {
 
   const hasEvents = useMemo(() => events.length > 0, [events])
 
-  const onRegister = (ev: EventItem) => {
-    navigate(`/register/${encodeURIComponent(ev.id)}`)
+  const onRegister = (ev: Event) => {
+    navigate(`/register/${encodeURIComponent(String(ev.id))}`,
+      { state: { event: ev } }
+    )
   }
 
   return (
