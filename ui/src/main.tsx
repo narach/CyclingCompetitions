@@ -7,6 +7,7 @@ import Home from './routes/Home'
 import Events from './routes/Events'
 import Admin from './routes/Admin'
 import Register from './routes/Register'
+import RegisterCompleted from './routes/RegisterCompleted'
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,7 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: 'events', element: <Events /> },
       { path: 'register/:eventId', element: <Register /> },
+      { path: 'register/:eventId/completed', element: <RegisterCompleted /> },
       { path: 'admin', element: <Admin /> },
     ],
   },

@@ -10,7 +10,7 @@ type EventItem = {
   event_start?: string | null
 }
 
-const API_URL = 'https://f6immlnq1c.execute-api.eu-central-1.amazonaws.com'
+const API_URL = 'https://8dakoeglog.execute-api.eu-central-1.amazonaws.com'
 
 export default function Events() {
   const navigate = useNavigate()

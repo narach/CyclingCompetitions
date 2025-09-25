@@ -18,7 +18,7 @@ const initialState: FormState = {
   event_location: ''
 }
 
-const API_URL = 'https://f6immlnq1c.execute-api.eu-central-1.amazonaws.com'
+const API_URL = 'https://8dakoeglog.execute-api.eu-central-1.amazonaws.com'
 
 export default function Admin() {
   const [showForm, setShowForm] = useState(false)
