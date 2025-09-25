@@ -1,0 +1,1 @@
+.\deploy-ui.ps1 -BucketName "cycling-mne-site-mf6lo5" -DistributionId "E2DVXZ0FCG422W"

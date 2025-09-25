@@ -1,0 +1,17 @@
+{
+  "name": "cycling-mne-db",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "migrate:up": "node-pg-migrate up",
+    "migrate:down": "node-pg-migrate down",
+    "migrate:status": "node-pg-migrate status"
+  },
+  "dependencies": {
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "node-pg-migrate": "^7.6.1"
+  }
+}
+

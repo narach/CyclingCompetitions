@@ -1,0 +1,12 @@
+{
+  "name": "events-create",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@aws-sdk/client-ssm": "^3.645.0",
+    "pg": "^8.12.0"
+  }
+}
+
