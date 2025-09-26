@@ -78,7 +78,12 @@ export default function Events() {
                     </td>
                     <td className="d-none d-lg-table-cell">
                       {ev.route ? (
-                        <a href={ev.route} target="_blank" rel="noreferrer">{t('common.view')}</a>
+                        <button
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() => navigate('/route', { state: { gpxUrl: ev.route, title: ev.event_name } })}
+                        >
+                          {t('common.view')}
+                        </button>
                       ) : (
                         <span className="text-muted">{t('common.dash')}</span>
                       )}

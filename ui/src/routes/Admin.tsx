@@ -61,8 +61,9 @@ export default function Admin() {
 
   const isValid = useMemo(() => {
     const hasFile = !!fileRef.current?.files && fileRef.current.files.length > 0
-    return form.event_name.trim() && form.event_date && form.event_time && hasFile
-  }, [form])
+    const hasRequired = !!(form.event_name.trim() && form.event_date && form.event_time)
+    return !!(hasRequired && (editEvent ? true : hasFile))
+  }, [form, editEvent])
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -172,7 +173,7 @@ export default function Admin() {
               <input className="form-control" name="event_location" value={form.event_location} onChange={onChange} placeholder="42.4411,19.2636" />
             </div>
             <div className="d-flex gap-2">
-              <button className="btn btn-success" disabled={!isValid || saving} onClick={onSave}>{editEvent ? t('common.save') : t('admin.save')}</button>
+              <button className="btn btn-success" disabled={!isValid || saving} onClick={onSave}>{editEvent ? 'Save' : t('admin.save')}</button>
               <button className="btn btn-outline-secondary" disabled={saving} onClick={() => setShowForm(false)}>{t('common.cancel')}</button>
             </div>
             {message && <div className="mt-3 alert alert-info" role="alert">{message}</div>}

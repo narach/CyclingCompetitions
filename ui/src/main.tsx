@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+import 'leaflet/dist/leaflet.css'
 import App from './routes/App'
 import Home from './routes/Home'
 import Events from './routes/Events'
@@ -10,6 +11,7 @@ import Admin from './routes/Admin'
 import AdminEvents from './routes/AdminEvents'
 import Register from './routes/Register'
 import RegisterCompleted from './routes/RegisterCompleted'
+import RouteViewer from './routes/RouteViewer'
 import './i18n'
 
 const router = createBrowserRouter([
@@ -21,6 +23,7 @@ const router = createBrowserRouter([
       { path: 'events', element: <Events /> },
       { path: 'register/:eventId', element: <Register /> },
       { path: 'register/:eventId/completed', element: <RegisterCompleted /> },
+      { path: 'route', element: <RouteViewer /> },
       { path: 'admin', element: <Admin /> },
       { path: 'admin/events', element: <AdminEvents /> },
     ],

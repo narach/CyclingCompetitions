@@ -42,3 +42,18 @@ resource "aws_s3_bucket_policy" "routes_public_read" {
 }
 
 
+resource "aws_s3_bucket_cors_configuration" "routes" {
+  bucket = aws_s3_bucket.routes.id
+  cors_rule {
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = [
+      "http://localhost:3000",
+      "https://${var.app_subdomain}.${var.root_domain}"
+    ]
+    allowed_headers = ["*"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
+
+
