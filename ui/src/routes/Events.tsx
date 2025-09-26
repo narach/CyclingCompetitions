@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { Event } from '../types'
 import { fetchEvents } from '../middleware/events'
+import { useTranslation } from 'react-i18next'
 
 export default function Events() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [events, setEvents] = useState<Event[]>([])
@@ -36,19 +38,19 @@ export default function Events() {
   return (
     <div>
       <div className="d-flex align-items-center justify-content-between mb-3">
-        <h2 className="mb-0">Events</h2>
-        <Link to="/admin" className="btn btn-outline-secondary">Admin</Link>
+        <h2 className="mb-0">{t('events.title')}</h2>
+        <Link to="/admin" className="btn btn-outline-secondary">{t('nav.admin')}</Link>
       </div>
 
-      {loading && <div className="alert alert-light">Loading events…</div>}
+      {loading && <div className="alert alert-light">{t('events.loading')}</div>}
       {error && (
         <div className="alert alert-danger" role="alert">
-          Failed to load events: {error}
+          {t('events.loadError', { error })}
         </div>
       )}
 
       {!loading && !error && !hasEvents && (
-        <div className="alert alert-info">No events available yet.</div>
+        <div className="alert alert-info">{t('events.none')}</div>
       )}
 
       {hasEvents && (
@@ -56,11 +58,11 @@ export default function Events() {
           <table className="table table-striped table-hover align-middle">
             <thead className="table-light">
               <tr>
-                <th scope="col">When</th>
-                <th scope="col">Name</th>
-                <th scope="col" className="d-none d-md-table-cell">Description</th>
-                <th scope="col" className="d-none d-lg-table-cell">Route</th>
-                <th scope="col" className="text-end">Actions</th>
+                <th scope="col">{t('events.table.when')}</th>
+                <th scope="col">{t('events.table.name')}</th>
+                <th scope="col" className="d-none d-md-table-cell">{t('events.table.description')}</th>
+                <th scope="col" className="d-none d-lg-table-cell">{t('events.table.route')}</th>
+                <th scope="col" className="text-end">{t('events.table.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -72,17 +74,17 @@ export default function Events() {
                     <td>{when}</td>
                     <td>{ev.event_name}</td>
                     <td className="d-none d-md-table-cell">
-                      {ev.event_description || <span className="text-muted">—</span>}
+                      {ev.event_description || <span className="text-muted">{t('common.dash')}</span>}
                     </td>
                     <td className="d-none d-lg-table-cell">
                       {ev.route ? (
-                        <a href={ev.route} target="_blank" rel="noreferrer">View</a>
+                        <a href={ev.route} target="_blank" rel="noreferrer">{t('common.view')}</a>
                       ) : (
-                        <span className="text-muted">—</span>
+                        <span className="text-muted">{t('common.dash')}</span>
                       )}
                     </td>
                     <td className="text-end">
-                      <button className="btn btn-primary" onClick={() => onRegister(ev)}>Register</button>
+                      <button className="btn btn-primary" onClick={() => onRegister(ev)}>{t('common.register')}</button>
                     </td>
                   </tr>
                 )

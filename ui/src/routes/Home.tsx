@@ -1,33 +1,15 @@
+import { useTranslation } from 'react-i18next'
+
 export default function Home() {
+  const { t } = useTranslation()
   return (
     <div>
-      <h1>Cycling community and competitions in Montenegro</h1>
-      <p>
-        Welcome to Cycling MNE, a community-driven platform dedicated to organizing
-        and promoting amateur cycling competitions across Montenegro. Our goal is to
-        connect riders, clubs, and volunteers to make it easy to discover events,
-        register to race, and share routes and results.
-      </p>
-      <p>
-        From coastal rides along the Adriatic to challenging climbs in the mountains,
-        Montenegro offers a diverse landscape for cyclists of all levels. We aim to
-        showcase these routes, provide clear event information, and keep logistics
-        simple for organizers and participants alike.
-      </p>
-      <p>
-        With this platform, you can browse upcoming events, register quickly, and
-        stay informed about schedules and updates. Organizers can create events in
-        minutes and manage registrations without hassle.
-      </p>
-      <p>
-        As an MVP, we focus on the essentials: creating events, registering riders,
-        and listing participants. We welcome feedback from the community to help us
-        improve and grow responsibly.
-      </p>
-      <p>
-        Whether you ride for fitness, adventure, or competition, Cycling MNE is here
-        to support your next ride in Montenegro.
-      </p>
+      <h1>{t('home.title')}</h1>
+      <p>{t('home.p1')}</p>
+      <p>{t('home.p2')}</p>
+      <p>{t('home.p3')}</p>
+      <p>{t('home.p4')}</p>
+      <p>{t('home.p5')}</p>
     </div>
   )
 }

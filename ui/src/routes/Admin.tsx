@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { createEvent } from '../middleware/events'
 import type { EventCreateInput, NewEventFormState } from '../types'
+import { useTranslation } from 'react-i18next'
 
 const initialState: NewEventFormState = {
   event_name: '',
@@ -14,6 +15,7 @@ const initialState: NewEventFormState = {
 // API calls are encapsulated in middleware/events
 
 export default function Admin() {
+  const { t } = useTranslation()
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -41,11 +43,11 @@ export default function Admin() {
         event_start: form.event_location.trim() || undefined
       }
       await createEvent(payload)
-      setMessage('Event created successfully')
+      setMessage(t('admin.success'))
       setForm(initialState)
       setShowForm(false)
     } catch (e: any) {
-      setMessage(`Failed to create event: ${e.message || e}`)
+      setMessage(t('admin.failure', { error: e.message || String(e) }))
     } finally {
       setSaving(false)
     }
@@ -53,43 +55,43 @@ export default function Admin() {
 
   return (
     <div>
-      <h2>Admin</h2>
+      <h2>{t('admin.title')}</h2>
       {!showForm && (
-        <button className="btn btn-primary" onClick={() => setShowForm(true)}>Create event</button>
+        <button className="btn btn-primary" onClick={() => setShowForm(true)}>{t('admin.create')}</button>
       )}
 
       {showForm && (
         <div className="card mt-3">
           <div className="card-body">
             <div className="mb-3">
-              <label className="form-label">Event name</label>
+              <label className="form-label">{t('admin.labels.name')}</label>
               <input className="form-control" name="event_name" value={form.event_name} onChange={onChange} />
             </div>
             <div className="row">
               <div className="col-md-6 mb-3">
-                <label className="form-label">Event date</label>
+                <label className="form-label">{t('admin.labels.date')}</label>
                 <input type="date" className="form-control" name="event_date" value={form.event_date} onChange={onChange} />
               </div>
               <div className="col-md-6 mb-3">
-                <label className="form-label">Event time</label>
+                <label className="form-label">{t('admin.labels.time')}</label>
                 <input type="time" className="form-control" name="event_time" value={form.event_time} onChange={onChange} />
               </div>
             </div>
             <div className="mb-3">
-              <label className="form-label">Event description</label>
+              <label className="form-label">{t('admin.labels.description')}</label>
               <textarea className="form-control" name="event_description" value={form.event_description} onChange={onChange} rows={3} />
             </div>
             <div className="mb-3">
-              <label className="form-label">Event route (URL)</label>
+              <label className="form-label">{t('admin.labels.route')}</label>
               <input className="form-control" name="event_route" value={form.event_route} onChange={onChange} placeholder="https://competitions.cycling-mne.club/data/route.gpx" />
             </div>
             <div className="mb-3">
-              <label className="form-label">Event location (GPS)</label>
+              <label className="form-label">{t('admin.labels.location')}</label>
               <input className="form-control" name="event_location" value={form.event_location} onChange={onChange} placeholder="42.4411,19.2636" />
             </div>
             <div className="d-flex gap-2">
-              <button className="btn btn-success" disabled={!isValid || saving} onClick={onSave}>Save event</button>
-              <button className="btn btn-outline-secondary" disabled={saving} onClick={() => setShowForm(false)}>Cancel</button>
+              <button className="btn btn-success" disabled={!isValid || saving} onClick={onSave}>{t('admin.save')}</button>
+              <button className="btn btn-outline-secondary" disabled={saving} onClick={() => setShowForm(false)}>{t('common.cancel')}</button>
             </div>
             {message && <div className="mt-3 alert alert-info" role="alert">{message}</div>}
           </div>
