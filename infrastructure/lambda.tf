@@ -70,6 +70,57 @@ data "archive_file" "events_list" {
   depends_on  = [null_resource.events_list_npm]
 }
 
+resource "null_resource" "events_update_npm" {
+  triggers = {
+    package_json_sha = filesha1("${path.module}/../lambdas/events-update/package.json")
+  }
+  provisioner "local-exec" {
+    working_dir = "${path.module}/../lambdas/events-update"
+    command     = "npm install --omit=dev"
+  }
+}
+
+data "archive_file" "events_update" {
+  type        = "zip"
+  source_dir  = "${path.module}/../lambdas/events-update"
+  output_path = "${path.module}/../lambdas/events-update/package.zip"
+  depends_on  = [null_resource.events_update_npm]
+}
+
+resource "null_resource" "events_delete_npm" {
+  triggers = {
+    package_json_sha = filesha1("${path.module}/../lambdas/events-delete/package.json")
+  }
+  provisioner "local-exec" {
+    working_dir = "${path.module}/../lambdas/events-delete"
+    command     = "npm install --omit=dev"
+  }
+}
+
+data "archive_file" "events_delete" {
+  type        = "zip"
+  source_dir  = "${path.module}/../lambdas/events-delete"
+  output_path = "${path.module}/../lambdas/events-delete/package.zip"
+  depends_on  = [null_resource.events_delete_npm]
+}
+
+resource "null_resource" "auth_admin_npm" {
+  triggers = {
+    package_json_sha = filesha1("${path.module}/../lambdas/auth-admin/package.json")
+  }
+  provisioner "local-exec" {
+    working_dir = "${path.module}/../lambdas/auth-admin"
+    command     = "npm install --omit=dev"
+  }
+}
+
+data "archive_file" "auth_admin" {
+  type        = "zip"
+  source_dir  = "${path.module}/../lambdas/auth-admin"
+  output_path = "${path.module}/../lambdas/auth-admin/package.zip"
+  depends_on  = [null_resource.auth_admin_npm]
+}
+
 resource "aws_cloudwatch_log_group" "lambda_events_create" {
   name              = "/aws/lambda/${var.service_tag}-events-create"
   retention_in_days = 7
@@ -97,7 +148,7 @@ resource "aws_lambda_function" "events_create" {
   runtime       = local.lambda_runtime
   handler       = "index.handler"
   filename      = data.archive_file.events_create.output_path
-  source_code_hash = filebase64sha256(data.archive_file.events_create.output_path)
+  source_code_hash = data.archive_file.events_create.output_base64sha256
   memory_size   = var.lambda_memory_mb
   timeout       = var.lambda_timeout_seconds
   reserved_concurrent_executions = 2
@@ -114,7 +165,7 @@ resource "aws_lambda_function" "registrations_create" {
   runtime       = local.lambda_runtime
   handler       = "index.handler"
   filename      = data.archive_file.registrations_create_built.output_path
-  source_code_hash = filebase64sha256(data.archive_file.registrations_create_built.output_path)
+  source_code_hash = data.archive_file.registrations_create_built.output_base64sha256
   memory_size   = var.lambda_memory_mb
   timeout       = var.lambda_timeout_seconds
   reserved_concurrent_executions = 2
@@ -131,7 +182,7 @@ resource "aws_lambda_function" "registrations_list" {
   runtime       = local.lambda_runtime
   handler       = "index.handler"
   filename      = data.archive_file.registrations_list.output_path
-  source_code_hash = filebase64sha256(data.archive_file.registrations_list.output_path)
+  source_code_hash = data.archive_file.registrations_list.output_base64sha256
   memory_size   = var.lambda_memory_mb
   timeout       = var.lambda_timeout_seconds
   reserved_concurrent_executions = 2
@@ -148,7 +199,7 @@ resource "aws_lambda_function" "events_list" {
   runtime       = local.lambda_runtime
   handler       = "index.handler"
   filename      = data.archive_file.events_list.output_path
-  source_code_hash = filebase64sha256(data.archive_file.events_list.output_path)
+  source_code_hash = data.archive_file.events_list.output_base64sha256
   memory_size   = var.lambda_memory_mb
   timeout       = var.lambda_timeout_seconds
   reserved_concurrent_executions = 2
@@ -156,6 +207,54 @@ resource "aws_lambda_function" "events_list" {
     variables = local.lambda_env
   }
   depends_on = [aws_cloudwatch_log_group.lambda_events_list]
+}
+
+resource "aws_lambda_function" "events_update" {
+  function_name = "${var.service_tag}-events-update"
+  role          = aws_iam_role.lambda_role.arn
+  architectures = [local.lambda_architecture]
+  runtime       = local.lambda_runtime
+  handler       = "index.handler"
+  filename      = data.archive_file.events_update.output_path
+  source_code_hash = data.archive_file.events_update.output_base64sha256
+  memory_size   = var.lambda_memory_mb
+  timeout       = var.lambda_timeout_seconds
+  reserved_concurrent_executions = 2
+  environment {
+    variables = local.lambda_env
+  }
+}
+
+resource "aws_lambda_function" "events_delete" {
+  function_name = "${var.service_tag}-events-delete"
+  role          = aws_iam_role.lambda_role.arn
+  architectures = [local.lambda_architecture]
+  runtime       = local.lambda_runtime
+  handler       = "index.handler"
+  filename      = data.archive_file.events_delete.output_path
+  source_code_hash = data.archive_file.events_delete.output_base64sha256
+  memory_size   = var.lambda_memory_mb
+  timeout       = var.lambda_timeout_seconds
+  reserved_concurrent_executions = 2
+  environment {
+    variables = local.lambda_env
+  }
+}
+
+resource "aws_lambda_function" "auth_admin" {
+  function_name = "${var.service_tag}-auth-admin"
+  role          = aws_iam_role.lambda_role.arn
+  architectures = [local.lambda_architecture]
+  runtime       = local.lambda_runtime
+  handler       = "index.handler"
+  filename      = data.archive_file.auth_admin.output_path
+  source_code_hash = data.archive_file.auth_admin.output_base64sha256
+  memory_size   = var.lambda_memory_mb
+  timeout       = var.lambda_timeout_seconds
+  reserved_concurrent_executions = 2
+  environment {
+    variables = local.lambda_env
+  }
 }
 
 resource "aws_lambda_function_event_invoke_config" "events_create" {

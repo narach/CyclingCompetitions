@@ -67,3 +67,25 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_put_routes" {
   policy_arn = aws_iam_policy.s3_put_routes.arn
 }
 
+data "aws_iam_policy_document" "s3_delete_routes" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "${aws_s3_bucket.routes.arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "s3_delete_routes" {
+  name   = "${var.service_tag}-s3-delete-routes"
+  policy = data.aws_iam_policy_document.s3_delete_routes.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_s3_delete_routes" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.s3_delete_routes.arn
+}
+
