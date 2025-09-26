@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { createEvent } from '../middleware/events'
 import type { EventCreateInput, NewEventFormState } from '../types'
 import { useTranslation } from 'react-i18next'
@@ -20,9 +20,11 @@ export default function Admin() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [form, setForm] = useState<NewEventFormState>(initialState)
+  const fileRef = useRef<HTMLInputElement | null>(null)
 
   const isValid = useMemo(() => {
-    return form.event_name.trim() && form.event_date && form.event_time && form.event_route.trim()
+    const hasFile = !!fileRef.current?.files && fileRef.current.files.length > 0
+    return form.event_name.trim() && form.event_date && form.event_time && hasFile
   }, [form])
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -35,16 +37,17 @@ export default function Admin() {
     setMessage(null)
     try {
       const dt = new Date(`${form.event_date}T${form.event_time}`)
-      const payload: EventCreateInput = {
-        event_name: form.event_name.trim(),
-        event_time: dt.toISOString(),
-        event_description: form.event_description.trim() || undefined,
-        route: form.event_route.trim(),
-        event_start: form.event_location.trim() || undefined
-      }
-      await createEvent(payload)
+      const fd = new FormData()
+      fd.append('event_name', form.event_name.trim())
+      fd.append('event_time', dt.toISOString())
+      if (form.event_description.trim()) fd.append('event_description', form.event_description.trim())
+      if (form.event_location.trim()) fd.append('event_start', form.event_location.trim())
+      const f = fileRef.current?.files?.[0]
+      if (f) fd.append('route', f, f.name)
+      await createEvent(fd)
       setMessage(t('admin.success'))
       setForm(initialState)
+      if (fileRef.current) fileRef.current.value = ''
       setShowForm(false)
     } catch (e: any) {
       setMessage(t('admin.failure', { error: e.message || String(e) }))
@@ -83,7 +86,8 @@ export default function Admin() {
             </div>
             <div className="mb-3">
               <label className="form-label">{t('admin.labels.route')}</label>
-              <input className="form-control" name="event_route" value={form.event_route} onChange={onChange} placeholder="https://competitions.cycling-mne.club/data/route.gpx" />
+              <input ref={fileRef} type="file" className="form-control" accept=".gpx,application/gpx+xml,application/octet-stream" />
+              <div className="form-text">GPX only</div>
             </div>
             <div className="mb-3">
               <label className="form-label">{t('admin.labels.location')}</label>

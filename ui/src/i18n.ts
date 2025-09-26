@@ -47,7 +47,7 @@ const resources = {
           date: 'Event date',
           time: 'Event time',
           description: 'Event description',
-          route: 'Event route (URL)',
+          route: 'Event route (GPX file)',
           location: 'Event location (GPS)'
         },
         success: 'Event created successfully',
@@ -153,7 +153,7 @@ const resources = {
           date: 'Дата события',
           time: 'Время события',
           description: 'Описание события',
-          route: 'Маршрут события (URL)',
+          route: 'Маршрут события (GPX fajl)',
           location: 'Локация события (GPS)'
         },
         success: 'Событие успешно создано',
@@ -259,7 +259,7 @@ const resources = {
           date: 'Datum događaja',
           time: 'Vrijeme događaja',
           description: 'Opis događaja',
-          route: 'Ruta događaja (URL)',
+          route: 'Ruta događaja (GPX fajl)',
           location: 'Lokacija događaja (GPS)'
         },
         success: 'Događaj je uspješno kreiran',

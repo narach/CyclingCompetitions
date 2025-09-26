@@ -7,6 +7,7 @@ locals {
     SSM_DB_URL_PARAM         = aws_ssm_parameter.db_connection_string.name
     DB_MAX_POOL              = "2"
     SERVICE_NAME             = var.service_tag
+    ROUTES_BUCKET            = aws_s3_bucket.routes.id
   }
 }
 
