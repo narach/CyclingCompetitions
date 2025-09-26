@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { RegistrationDTO, RegistrationInput, Event } from '../types'
 import { registerForEvent } from '../middleware/registrations'
+import { useTranslation } from 'react-i18next'
 
 // API calls and types are imported from middleware and shared types
 
@@ -10,6 +11,7 @@ const phoneRegex = /^[+]?[-()\s\d]{7,20}$/
 
 export default function Register() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { eventId } = useParams()
   const { state } = useLocation() as { state?: { event?: Event } }
   const event = state?.event
@@ -56,15 +58,15 @@ export default function Register() {
 
   const validate = (data: RegistrationInput): Record<string, string> => {
     const errs: Record<string, string> = {}
-    if (!Number.isInteger(data.eventId)) errs.eventId = 'Invalid event'
-    if (!data.name?.trim()) errs.name = 'Name is required'
-    if (!data.surname?.trim()) errs.surname = 'Surname is required'
-    if (!data.email?.trim()) errs.email = 'Email is required'
-    if (data.email && !emailRegex.test(data.email)) errs.email = 'Invalid email'
-    if (data.phone && !phoneRegex.test(data.phone)) errs.phone = 'Invalid phone'
+    if (!Number.isInteger(data.eventId)) errs.eventId = t('register.errors.invalidEvent')
+    if (!data.name?.trim()) errs.name = t('register.errors.nameRequired')
+    if (!data.surname?.trim()) errs.surname = t('register.errors.surnameRequired')
+    if (!data.email?.trim()) errs.email = t('register.errors.emailRequired')
+    if (data.email && !emailRegex.test(data.email)) errs.email = t('register.errors.invalidEmail')
+    if (data.phone && !phoneRegex.test(data.phone)) errs.phone = t('register.errors.invalidPhone')
     if (data.birth_year !== undefined) {
-      if (!Number.isInteger(data.birth_year)) errs.birth_year = 'Birth year must be integer'
-      else if (data.birth_year < 1925 || data.birth_year > currentYear) errs.birth_year = 'Birth year out of range'
+      if (!Number.isInteger(data.birth_year)) errs.birth_year = t('register.errors.birthYearInteger')
+      else if (data.birth_year < 1925 || data.birth_year > currentYear) errs.birth_year = t('register.errors.birthYearRange')
     }
     return errs
   }
@@ -104,32 +106,32 @@ export default function Register() {
   if (!Number.isInteger(eventIdNum)) {
     return (
       <div>
-        <h2>Register</h2>
-        <div className="alert alert-danger">Invalid event id in URL.</div>
-        <Link to="/events" className="btn btn-outline-primary">Back to events</Link>
+        <h2>{t('register.title')}</h2>
+        <div className="alert alert-danger">{t('register.invalidEventId')}</div>
+        <Link to="/events" className="btn btn-outline-primary">{t('register.backToEvents')}</Link>
       </div>
     )
   }
 
   return (
     <div>
-      <h2>Register to {event?.event_name || 'Event'}</h2>
+      <h2>{t('register.titleTo', { event: event?.event_name || t('events.title') })}</h2>
 
       {event && (
         <div className="mb-3">
           <div className="row g-2">
             <div className="col-md-4">
-              <div className="small text-muted">When</div>
+              <div className="small text-muted">{t('register.when')}</div>
               <div>{(() => { const d = new Date(event.event_time); return isNaN(d.getTime()) ? event.event_time : d.toLocaleString() })()}</div>
             </div>
             <div className="col-md-4">
-              <div className="small text-muted">Description</div>
-              <div>{event.event_description || '—'}</div>
+              <div className="small text-muted">{t('register.description')}</div>
+              <div>{event.event_description || t('common.dash')}</div>
             </div>
             <div className="col-md-4">
-              <div className="small text-muted">Route</div>
+              <div className="small text-muted">{t('register.route')}</div>
               <div>
-                {event.route ? <a href={event.route} target="_blank" rel="noreferrer">View</a> : '—'}
+                {event.route ? <a href={event.route} target="_blank" rel="noreferrer">{t('register.view')}</a> : t('common.dash')}
               </div>
             </div>
           </div>
@@ -144,7 +146,7 @@ export default function Register() {
         <div className="card-body">
           <div className="row">
             <div className="col-md-6 mb-3">
-              <label className="form-label">Name <span className="text-danger">*</span></label>
+              <label className="form-label">{t('register.form.name')} <span className="text-danger">*</span></label>
               <input
                 className={`form-control${errors.name ? ' is-invalid' : ''}`}
                 name="name"
@@ -154,7 +156,7 @@ export default function Register() {
               {errors.name && <div className="invalid-feedback">{errors.name}</div>}
             </div>
             <div className="col-md-6 mb-3">
-              <label className="form-label">Surname <span className="text-danger">*</span></label>
+              <label className="form-label">{t('register.form.surname')} <span className="text-danger">*</span></label>
               <input
                 className={`form-control${errors.surname ? ' is-invalid' : ''}`}
                 name="surname"
@@ -167,7 +169,7 @@ export default function Register() {
 
           <div className="row">
             <div className="col-md-6 mb-3">
-              <label className="form-label">Email <span className="text-danger">*</span></label>
+              <label className="form-label">{t('register.form.email')} <span className="text-danger">*</span></label>
               <input
                 type="email"
                 placeholder="your@email.com"
@@ -179,7 +181,7 @@ export default function Register() {
               {errors.email && <div className="invalid-feedback">{errors.email}</div>}
             </div>
             <div className="col-md-6 mb-3">
-              <label className="form-label">Phone</label>
+              <label className="form-label">{t('register.form.phone')}</label>
               <input
                 placeholder="+382 67 123 456"
                 className={`form-control${errors.phone ? ' is-invalid' : ''}`}
@@ -193,22 +195,22 @@ export default function Register() {
 
           <div className="row">
             <div className="col-md-4 mb-3">
-              <label className="form-label">Gender</label>
+              <label className="form-label">{t('register.form.gender')}</label>
               <select className="form-select" name="gender" value={form.gender} onChange={onChange}>
-                <option value="">—</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
+                <option value="">{t('common.dash')}</option>
+                <option value="Male">{t('register.form.male')}</option>
+                <option value="Female">{t('register.form.female')}</option>
               </select>
             </div>
             <div className="col-md-4 mb-3">
-              <label className="form-label">Birth year</label>
+              <label className="form-label">{t('register.form.birthYear')}</label>
               <select
                 className={`form-select${errors.birth_year ? ' is-invalid' : ''}`}
                 name="birth_year"
                 value={form.birth_year ?? ''}
                 onChange={onChange}
               >
-                <option value="">—</option>
+                <option value="">{t('common.dash')}</option>
                 {years.map(y => (
                   <option key={y} value={y}>{y}</option>
                 ))}
@@ -220,22 +222,22 @@ export default function Register() {
 
           <div className="row">
             <div className="col-md-4 mb-3">
-              <label className="form-label">Club</label>
+              <label className="form-label">{t('register.form.club')}</label>
               <input className="form-control" name="club" value={form.club} onChange={onChange} />
             </div>
             <div className="col-md-4 mb-3">
-              <label className="form-label">Country</label>
+              <label className="form-label">{t('register.form.country')}</label>
               <input className="form-control" name="country" value={form.country} onChange={onChange} />
             </div>
             <div className="col-md-4 mb-3">
-              <label className="form-label">City</label>
+              <label className="form-label">{t('register.form.city')}</label>
               <input className="form-control" name="city" value={form.city} onChange={onChange} />
             </div>
           </div>
 
           <div className="d-flex gap-2">
-            <button className="btn btn-primary" onClick={onSubmit} disabled={submitting}>Register</button>
-            <Link to="/events" className="btn btn-outline-secondary">Cancel</Link>
+            <button className="btn btn-primary" onClick={onSubmit} disabled={submitting}>{t('register.buttons.register')}</button>
+            <Link to="/events" className="btn btn-outline-secondary">{t('register.buttons.cancel')}</Link>
           </div>
         </div>
       </div>

@@ -2,12 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import App from './routes/App'
 import Home from './routes/Home'
 import Events from './routes/Events'
 import Admin from './routes/Admin'
 import Register from './routes/Register'
 import RegisterCompleted from './routes/RegisterCompleted'
+import './i18n'
 
 const router = createBrowserRouter([
   {
