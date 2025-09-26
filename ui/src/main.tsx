@@ -7,6 +7,7 @@ import App from './routes/App'
 import Home from './routes/Home'
 import Events from './routes/Events'
 import Admin from './routes/Admin'
+import AdminEvents from './routes/AdminEvents'
 import Register from './routes/Register'
 import RegisterCompleted from './routes/RegisterCompleted'
 import './i18n'
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
       { path: 'register/:eventId', element: <Register /> },
       { path: 'register/:eventId/completed', element: <RegisterCompleted /> },
       { path: 'admin', element: <Admin /> },
+      { path: 'admin/events', element: <AdminEvents /> },
     ],
   },
 ])

@@ -27,9 +27,7 @@ export default function App() {
               <li className="nav-item">
                 <Link className={`nav-link${location.pathname.startsWith('/events') ? ' active' : ''}`} to="/events">{t('nav.events')}</Link>
               </li>
-              <li className="nav-item">
-                <Link className={`nav-link${location.pathname.startsWith('/admin') ? ' active' : ''}`} to="/admin">{t('nav.admin')}</Link>
-              </li>
+              {/* Admin link hidden intentionally */}
             </ul>
             <div className="d-flex">
               <div className="dropdown ms-auto">

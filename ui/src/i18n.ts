@@ -42,6 +42,7 @@ const resources = {
       admin: {
         title: 'Admin',
         create: 'Create event',
+        viewEvents: 'View Events',
         labels: {
           name: 'Event name',
           date: 'Event date',
@@ -53,6 +54,15 @@ const resources = {
         success: 'Event created successfully',
         failure: 'Failed to create event: {{error}}',
         save: 'Save event'
+      },
+      auth: {
+        title: 'Admin authentication',
+        username: 'Username',
+        password: 'Password',
+        login: 'Login',
+        errors: {
+          wrongCredentials: 'Wrong admin credentials'
+        }
       },
       register: {
         title: 'Register',
@@ -148,6 +158,7 @@ const resources = {
       admin: {
         title: 'Админ',
         create: 'Создать событие',
+        viewEvents: 'Просмотр событий',
         labels: {
           name: 'Название события',
           date: 'Дата события',
@@ -159,6 +170,15 @@ const resources = {
         success: 'Событие успешно создано',
         failure: 'Не удалось создать событие: {{error}}',
         save: 'Сохранить событие'
+      },
+      auth: {
+        title: 'Авторизация администратора',
+        username: 'Логин',
+        password: 'Пароль',
+        login: 'Войти',
+        errors: {
+          wrongCredentials: 'Неверные админские учетные данные'
+        }
       },
       register: {
         title: 'Регистрация',
@@ -254,6 +274,7 @@ const resources = {
       admin: {
         title: 'Admin',
         create: 'Kreiraj događaj',
+        viewEvents: 'Prikaži događaje',
         labels: {
           name: 'Naziv događaja',
           date: 'Datum događaja',
@@ -265,6 +286,15 @@ const resources = {
         success: 'Događaj je uspješno kreiran',
         failure: 'Neuspješno kreiranje događaja: {{error}}',
         save: 'Sačuvaj događaj'
+      },
+      auth: {
+        title: 'Admin autentifikacija',
+        username: 'Korisničko ime',
+        password: 'Lozinka',
+        login: 'Prijava',
+        errors: {
+          wrongCredentials: 'Pogrešni admin kredencijali'
+        }
       },
       register: {
         title: 'Registracija',
