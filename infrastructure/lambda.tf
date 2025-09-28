@@ -14,10 +14,12 @@ locals {
 resource "null_resource" "events_create_npm" {
   triggers = {
     package_json_sha = filesha1("${path.module}/../lambdas/events-create/package.json")
+    tsconfig_sha     = filesha1("${path.module}/../lambdas/events-create/tsconfig.json")
+    src_sha          = filesha1("${path.module}/../lambdas/events-create/src/index.ts")
   }
   provisioner "local-exec" {
     working_dir = "${path.module}/../lambdas/events-create"
-    command     = "npm install --omit=dev"
+    command     = "npm install && npm run build && npm prune --omit=dev"
   }
 }
 
@@ -51,15 +53,18 @@ data "archive_file" "registrations_list" {
   type        = "zip"
   source_dir  = "${path.module}/../lambdas/registrations-list"
   output_path = "${path.module}/../lambdas/registrations-list/package.zip"
+  depends_on  = [null_resource.registrations_list_build]
 }
 
 resource "null_resource" "events_list_npm" {
   triggers = {
     package_json_sha = filesha1("${path.module}/../lambdas/events-list/package.json")
+    tsconfig_sha     = filesha1("${path.module}/../lambdas/events-list/tsconfig.json")
+    src_sha          = filesha1("${path.module}/../lambdas/events-list/src/index.ts")
   }
   provisioner "local-exec" {
     working_dir = "${path.module}/../lambdas/events-list"
-    command     = "npm install --omit=dev"
+    command     = "npm install && npm run build && npm prune --omit=dev"
   }
 }
 
@@ -73,10 +78,12 @@ data "archive_file" "events_list" {
 resource "null_resource" "events_update_npm" {
   triggers = {
     package_json_sha = filesha1("${path.module}/../lambdas/events-update/package.json")
+    tsconfig_sha     = filesha1("${path.module}/../lambdas/events-update/tsconfig.json")
+    src_sha          = filesha1("${path.module}/../lambdas/events-update/src/index.ts")
   }
   provisioner "local-exec" {
     working_dir = "${path.module}/../lambdas/events-update"
-    command     = "npm install --omit=dev"
+    command     = "npm install && npm run build && npm prune --omit=dev"
   }
 }
 
@@ -90,10 +97,12 @@ data "archive_file" "events_update" {
 resource "null_resource" "events_delete_npm" {
   triggers = {
     package_json_sha = filesha1("${path.module}/../lambdas/events-delete/package.json")
+    tsconfig_sha     = filesha1("${path.module}/../lambdas/events-delete/tsconfig.json")
+    src_sha          = filesha1("${path.module}/../lambdas/events-delete/src/index.ts")
   }
   provisioner "local-exec" {
     working_dir = "${path.module}/../lambdas/events-delete"
-    command     = "npm install --omit=dev"
+    command     = "npm install && npm run build && npm prune --omit=dev"
   }
 }
 
@@ -107,10 +116,25 @@ data "archive_file" "events_delete" {
 resource "null_resource" "auth_admin_npm" {
   triggers = {
     package_json_sha = filesha1("${path.module}/../lambdas/auth-admin/package.json")
+    tsconfig_sha     = filesha1("${path.module}/../lambdas/auth-admin/tsconfig.json")
+    src_sha          = filesha1("${path.module}/../lambdas/auth-admin/src/index.ts")
   }
   provisioner "local-exec" {
     working_dir = "${path.module}/../lambdas/auth-admin"
-    command     = "npm install --omit=dev"
+    command     = "npm install && npm run build && npm prune --omit=dev"
+  }
+}
+
+# Build step for registrations-list (TypeScript)
+resource "null_resource" "registrations_list_build" {
+  triggers = {
+    package_json_sha = filesha1("${path.module}/../lambdas/registrations-list/package.json")
+    tsconfig_sha     = filesha1("${path.module}/../lambdas/registrations-list/tsconfig.json")
+    src_sha          = filesha1("${path.module}/../lambdas/registrations-list/src/index.ts")
+  }
+  provisioner "local-exec" {
+    working_dir = "${path.module}/../lambdas/registrations-list"
+    command     = "npm install && npm run build && npm prune --omit=dev"
   }
 }
 

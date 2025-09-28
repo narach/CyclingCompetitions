@@ -81,7 +81,11 @@ export default function Admin() {
       if (form.event_description.trim()) fd.append('event_description', form.event_description.trim())
       if (form.event_location.trim()) fd.append('event_start', form.event_location.trim())
       const f = fileRef.current?.files?.[0]
-      if (f) fd.append('route', f, f.name)
+      if (f) {
+        const routeName = f.name.replace(/\.[^.]+$/,'')
+        fd.append('route', f, f.name)
+        fd.append('route_name', routeName)
+      }
       if (editEvent) await updateEvent(editEvent.id, fd)
       else await createEvent(fd)
       setMessage(t('admin.success'))

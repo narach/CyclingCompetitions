@@ -1,5 +1,5 @@
 {
-  "name": "auth-admin",
+  "name": "registrations-list",
   "version": "0.1.0",
   "private": true,
   "main": "dist/index.js",
@@ -7,14 +7,10 @@
   "scripts": {
     "build": "tsc"
   },
-  "dependencies": {
-    "@aws-sdk/client-ssm": "^3.645.0",
-    "jsonwebtoken": "^9.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "typescript": "^5.6.2",
-    "@types/node": "^20.12.12",
-    "@types/jsonwebtoken": "^9.0.6"
+    "@types/node": "^20.12.12"
   }
 }
 
