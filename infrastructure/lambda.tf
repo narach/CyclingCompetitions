@@ -296,3 +296,216 @@ resource "aws_lambda_function_event_invoke_config" "registrations_list" {
   maximum_retry_attempts = 0
 }
 
+# =========================
+# Routes Lambdas (build & zip)
+# =========================
+
+resource "null_resource" "routes_create_npm" {
+  triggers = {
+    package_json_sha = filesha1("${path.module}/../lambdas/routes/routes-create/package.json")
+    tsconfig_sha     = filesha1("${path.module}/../lambdas/routes/routes-create/tsconfig.json")
+    src_sha          = filesha1("${path.module}/../lambdas/routes/routes-create/src/index.ts")
+  }
+  provisioner "local-exec" {
+    working_dir = "${path.module}/../lambdas/routes/routes-create"
+    command     = "npm install && npm run build && npm prune --omit=dev"
+  }
+}
+
+data "archive_file" "routes_create" {
+  type        = "zip"
+  source_dir  = "${path.module}/../lambdas/routes/routes-create"
+  output_path = "${path.module}/../lambdas/routes/routes-create/package.zip"
+  depends_on  = [null_resource.routes_create_npm]
+}
+
+resource "null_resource" "routes_update_npm" {
+  triggers = {
+    package_json_sha = filesha1("${path.module}/../lambdas/routes/routes-update/package.json")
+    tsconfig_sha     = filesha1("${path.module}/../lambdas/routes/routes-update/tsconfig.json")
+    src_sha          = filesha1("${path.module}/../lambdas/routes/routes-update/src/index.ts")
+  }
+  provisioner "local-exec" {
+    working_dir = "${path.module}/../lambdas/routes/routes-update"
+    command     = "npm install && npm run build && npm prune --omit=dev"
+  }
+}
+
+data "archive_file" "routes_update" {
+  type        = "zip"
+  source_dir  = "${path.module}/../lambdas/routes/routes-update"
+  output_path = "${path.module}/../lambdas/routes/routes-update/package.zip"
+  depends_on  = [null_resource.routes_update_npm]
+}
+
+resource "null_resource" "routes_delete_npm" {
+  triggers = {
+    package_json_sha = filesha1("${path.module}/../lambdas/routes/routes-delete/package.json")
+    tsconfig_sha     = filesha1("${path.module}/../lambdas/routes/routes-delete/tsconfig.json")
+    src_sha          = filesha1("${path.module}/../lambdas/routes/routes-delete/src/index.ts")
+  }
+  provisioner "local-exec" {
+    working_dir = "${path.module}/../lambdas/routes/routes-delete"
+    command     = "npm install && npm run build && npm prune --omit=dev"
+  }
+}
+
+data "archive_file" "routes_delete" {
+  type        = "zip"
+  source_dir  = "${path.module}/../lambdas/routes/routes-delete"
+  output_path = "${path.module}/../lambdas/routes/routes-delete/package.zip"
+  depends_on  = [null_resource.routes_delete_npm]
+}
+
+resource "null_resource" "routes_list_npm" {
+  triggers = {
+    package_json_sha = filesha1("${path.module}/../lambdas/routes/routes-list/package.json")
+    tsconfig_sha     = filesha1("${path.module}/../lambdas/routes/routes-list/tsconfig.json")
+    src_sha          = filesha1("${path.module}/../lambdas/routes/routes-list/src/index.ts")
+  }
+  provisioner "local-exec" {
+    working_dir = "${path.module}/../lambdas/routes/routes-list"
+    command     = "npm install && npm run build && npm prune --omit=dev"
+  }
+}
+
+data "archive_file" "routes_list" {
+  type        = "zip"
+  source_dir  = "${path.module}/../lambdas/routes/routes-list"
+  output_path = "${path.module}/../lambdas/routes/routes-list/package.zip"
+  depends_on  = [null_resource.routes_list_npm]
+}
+
+resource "null_resource" "routes_get_by_id_npm" {
+  triggers = {
+    package_json_sha = filesha1("${path.module}/../lambdas/routes/routes-get-by-id/package.json")
+    tsconfig_sha     = filesha1("${path.module}/../lambdas/routes/routes-get-by-id/tsconfig.json")
+    src_sha          = filesha1("${path.module}/../lambdas/routes/routes-get-by-id/src/index.ts")
+  }
+  provisioner "local-exec" {
+    working_dir = "${path.module}/../lambdas/routes/routes-get-by-id"
+    command     = "npm install && npm run build && npm prune --omit=dev"
+  }
+}
+
+data "archive_file" "routes_get_by_id" {
+  type        = "zip"
+  source_dir  = "${path.module}/../lambdas/routes/routes-get-by-id"
+  output_path = "${path.module}/../lambdas/routes/routes-get-by-id/package.zip"
+  depends_on  = [null_resource.routes_get_by_id_npm]
+}
+
+# =========================
+# Routes Lambdas (logs + functions)
+# =========================
+
+resource "aws_cloudwatch_log_group" "lambda_routes_create" {
+  name              = "/aws/lambda/${var.service_tag}-routes-create"
+  retention_in_days = 7
+}
+
+resource "aws_cloudwatch_log_group" "lambda_routes_update" {
+  name              = "/aws/lambda/${var.service_tag}-routes-update"
+  retention_in_days = 7
+}
+
+resource "aws_cloudwatch_log_group" "lambda_routes_delete" {
+  name              = "/aws/lambda/${var.service_tag}-routes-delete"
+  retention_in_days = 7
+}
+
+resource "aws_cloudwatch_log_group" "lambda_routes_list" {
+  name              = "/aws/lambda/${var.service_tag}-routes-list"
+  retention_in_days = 7
+}
+
+resource "aws_cloudwatch_log_group" "lambda_routes_get_by_id" {
+  name              = "/aws/lambda/${var.service_tag}-routes-get-by-id"
+  retention_in_days = 7
+}
+
+resource "aws_lambda_function" "routes_create" {
+  function_name = "${var.service_tag}-routes-create"
+  role          = aws_iam_role.lambda_role.arn
+  architectures = [local.lambda_architecture]
+  runtime       = local.lambda_runtime
+  handler       = "index.handler"
+  filename      = data.archive_file.routes_create.output_path
+  source_code_hash = data.archive_file.routes_create.output_base64sha256
+  memory_size   = var.lambda_memory_mb
+  timeout       = var.lambda_timeout_seconds
+  reserved_concurrent_executions = 2
+  environment {
+    variables = local.lambda_env
+  }
+  depends_on = [aws_cloudwatch_log_group.lambda_routes_create]
+}
+
+resource "aws_lambda_function" "routes_update" {
+  function_name = "${var.service_tag}-routes-update"
+  role          = aws_iam_role.lambda_role.arn
+  architectures = [local.lambda_architecture]
+  runtime       = local.lambda_runtime
+  handler       = "index.handler"
+  filename      = data.archive_file.routes_update.output_path
+  source_code_hash = data.archive_file.routes_update.output_base64sha256
+  memory_size   = var.lambda_memory_mb
+  timeout       = var.lambda_timeout_seconds
+  reserved_concurrent_executions = 2
+  environment {
+    variables = local.lambda_env
+  }
+  depends_on = [aws_cloudwatch_log_group.lambda_routes_update]
+}
+
+resource "aws_lambda_function" "routes_delete" {
+  function_name = "${var.service_tag}-routes-delete"
+  role          = aws_iam_role.lambda_role.arn
+  architectures = [local.lambda_architecture]
+  runtime       = local.lambda_runtime
+  handler       = "index.handler"
+  filename      = data.archive_file.routes_delete.output_path
+  source_code_hash = data.archive_file.routes_delete.output_base64sha256
+  memory_size   = var.lambda_memory_mb
+  timeout       = var.lambda_timeout_seconds
+  reserved_concurrent_executions = 2
+  environment {
+    variables = local.lambda_env
+  }
+  depends_on = [aws_cloudwatch_log_group.lambda_routes_delete]
+}
+
+resource "aws_lambda_function" "routes_list" {
+  function_name = "${var.service_tag}-routes-list"
+  role          = aws_iam_role.lambda_role.arn
+  architectures = [local.lambda_architecture]
+  runtime       = local.lambda_runtime
+  handler       = "index.handler"
+  filename      = data.archive_file.routes_list.output_path
+  source_code_hash = data.archive_file.routes_list.output_base64sha256
+  memory_size   = var.lambda_memory_mb
+  timeout       = var.lambda_timeout_seconds
+  reserved_concurrent_executions = 2
+  environment {
+    variables = local.lambda_env
+  }
+  depends_on = [aws_cloudwatch_log_group.lambda_routes_list]
+}
+
+resource "aws_lambda_function" "routes_get_by_id" {
+  function_name = "${var.service_tag}-routes-get-by-id"
+  role          = aws_iam_role.lambda_role.arn
+  architectures = [local.lambda_architecture]
+  runtime       = local.lambda_runtime
+  handler       = "index.handler"
+  filename      = data.archive_file.routes_get_by_id.output_path
+  source_code_hash = data.archive_file.routes_get_by_id.output_base64sha256
+  memory_size   = var.lambda_memory_mb
+  timeout       = var.lambda_timeout_seconds
+  reserved_concurrent_executions = 2
+  environment {
+    variables = local.lambda_env
+  }
+  depends_on = [aws_cloudwatch_log_group.lambda_routes_get_by_id]
+}
+

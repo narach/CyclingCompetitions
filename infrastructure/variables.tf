@@ -69,3 +69,9 @@ variable "throttling_rate_limit" {
   default     = 5
 }
 
+variable "aws_profile" {
+  description = "AWS named profile to use for provider authentication"
+  type        = string
+  default     = "personal-eureka"
+}
+

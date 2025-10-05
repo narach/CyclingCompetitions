@@ -84,6 +84,45 @@ resource "aws_apigatewayv2_integration" "auth_admin" {
   payload_format_version = "2.0"
 }
 
+# =========================
+# Routes integrations
+# =========================
+
+resource "aws_apigatewayv2_integration" "routes_create" {
+  api_id                 = aws_apigatewayv2_api.http_api.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.routes_create.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "routes_update" {
+  api_id                 = aws_apigatewayv2_api.http_api.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.routes_update.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "routes_delete" {
+  api_id                 = aws_apigatewayv2_api.http_api.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.routes_delete.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "routes_list" {
+  api_id                 = aws_apigatewayv2_api.http_api.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.routes_list.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "routes_get_by_id" {
+  api_id                 = aws_apigatewayv2_api.http_api.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.routes_get_by_id.invoke_arn
+  payload_format_version = "2.0"
+}
+
 resource "aws_apigatewayv2_route" "events_create" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "POST /events"
@@ -124,6 +163,40 @@ resource "aws_apigatewayv2_route" "auth_admin" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "POST /auth/login"
   target    = "integrations/${aws_apigatewayv2_integration.auth_admin.id}"
+}
+
+# =========================
+# Routes routes
+# =========================
+
+resource "aws_apigatewayv2_route" "routes_create" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "POST /routes"
+  target    = "integrations/${aws_apigatewayv2_integration.routes_create.id}"
+}
+
+resource "aws_apigatewayv2_route" "routes_update" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "PUT /routes/{id}"
+  target    = "integrations/${aws_apigatewayv2_integration.routes_update.id}"
+}
+
+resource "aws_apigatewayv2_route" "routes_delete" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "DELETE /routes/{id}"
+  target    = "integrations/${aws_apigatewayv2_integration.routes_delete.id}"
+}
+
+resource "aws_apigatewayv2_route" "routes_list" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "GET /routes"
+  target    = "integrations/${aws_apigatewayv2_integration.routes_list.id}"
+}
+
+resource "aws_apigatewayv2_route" "routes_get_by_id" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "GET /routes/{id}"
+  target    = "integrations/${aws_apigatewayv2_integration.routes_get_by_id.id}"
 }
 
 resource "aws_lambda_permission" "apigw_events_create" {
@@ -178,6 +251,50 @@ resource "aws_lambda_permission" "apigw_auth_admin" {
   statement_id  = "AllowInvokeByApiGatewayAuthAdmin"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.auth_admin.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
+}
+
+# =========================
+# Permissions for routes lambdas
+# =========================
+
+resource "aws_lambda_permission" "apigw_routes_create" {
+  statement_id  = "AllowInvokeByApiGatewayRoutesCreate"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.routes_create.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_routes_update" {
+  statement_id  = "AllowInvokeByApiGatewayRoutesUpdate"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.routes_update.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_routes_delete" {
+  statement_id  = "AllowInvokeByApiGatewayRoutesDelete"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.routes_delete.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_routes_list" {
+  statement_id  = "AllowInvokeByApiGatewayRoutesList"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.routes_list.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_routes_get_by_id" {
+  statement_id  = "AllowInvokeByApiGatewayRoutesGetById"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.routes_get_by_id.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
 }
